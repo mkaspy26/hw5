@@ -1,0 +1,5 @@
+# Install into the project venv:  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+fastmcp==4.1.0
+pydantic-ai-slim[openai,mcp]==2.55.0
+fastapi==0.143.0
+uvicorn[standard]==0.54.0

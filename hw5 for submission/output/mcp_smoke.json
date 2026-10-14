@@ -1,0 +1,173 @@
+{
+  "problem": "Problem 4: Add the MCP server to vibe coder and test each tool",
+  "problem_prompt": "create .mcp.json in the project root (or however u save the local MCP server lists) which is the connection JSON text that basically adds my MCP server to this project so that you can call the tools (I actually am not sure i actually need this since i think this sounds like if i wanted another external vibe coder to connect or something -- let me know!) now, test each of the 3 mcp tools and save the evidence in output/mcp_smoke.json and for each tool include 1. the prompt i asked you 2. tool name 3. tool output (must match values in data/campus_customs_new.db)",
+  "run_at": "2026-10-13T00:23:36-04:00",
+  "connection": {
+    "config_file": ".mcp.json",
+    "server": "campus-customs",
+    "transport": "stdio",
+    "tools_listed": [
+      "check_stock_and_price",
+      "get_invoice_with_vendor",
+      "get_lease_and_cash"
+    ]
+  },
+  "all_tools_tested": true,
+  "all_match_db": true,
+  "results": [
+    {
+      "ticket": 101,
+      "prompt": "Ticket 101: Tauhid Zaman wants 1 Classic Bulldog Tee (CC-TEE-WHITE) in size S. Is it in stock, and what does it cost?",
+      "tool_name": "check_stock_and_price",
+      "tool_input": {
+        "sku": "CC-TEE-WHITE",
+        "size": "S"
+      },
+      "tool_output": {
+        "sku": "CC-TEE-WHITE",
+        "name": "Classic Bulldog Tee",
+        "size": "S",
+        "qty": 0,
+        "location": "Aisle B",
+        "unit_cost": 8.0,
+        "list_price": 28.0
+      },
+      "db_check": {
+        "source": "data/campus_customs_new.db",
+        "query": "SELECT i.sku,i.name,i.size,i.qty,i.location,p.unit_cost,p.list_price FROM inventory i LEFT JOIN pricing p ON p.sku=i.sku WHERE i.sku='CC-TEE-WHITE' AND i.size='S'",
+        "values_from_db": {
+          "sku": "CC-TEE-WHITE",
+          "name": "Classic Bulldog Tee",
+          "size": "S",
+          "qty": 0,
+          "location": "Aisle B",
+          "unit_cost": 8.0,
+          "list_price": 28.0
+        },
+        "matches_db": true
+      }
+    },
+    {
+      "ticket": 103,
+      "prompt": "Ticket 103: Yale AI Club wants 20 Basic Hoodies Big Yale (CC-HOOD-NAVY) in size M at a bulk discount. How many are on hand, and what are the unit cost and list price?",
+      "tool_name": "check_stock_and_price",
+      "tool_input": {
+        "sku": "CC-HOOD-NAVY",
+        "size": "M"
+      },
+      "tool_output": {
+        "sku": "CC-HOOD-NAVY",
+        "name": "Basic Hoodie Big Yale",
+        "size": "M",
+        "qty": 8,
+        "location": "Aisle A",
+        "unit_cost": 22.0,
+        "list_price": 58.0
+      },
+      "db_check": {
+        "source": "data/campus_customs_new.db",
+        "query": "SELECT i.sku,i.name,i.size,i.qty,i.location,p.unit_cost,p.list_price FROM inventory i LEFT JOIN pricing p ON p.sku=i.sku WHERE i.sku='CC-HOOD-NAVY' AND i.size='M'",
+        "values_from_db": {
+          "sku": "CC-HOOD-NAVY",
+          "name": "Basic Hoodie Big Yale",
+          "size": "M",
+          "qty": 8,
+          "location": "Aisle A",
+          "unit_cost": 22.0,
+          "list_price": 58.0
+        },
+        "matches_db": true
+      }
+    },
+    {
+      "ticket": 101,
+      "prompt": "Ticket 101 links to invoice 501. Who is the vendor, how much is owed, is it overdue, and how long until the reprint arrives?",
+      "tool_name": "get_invoice_with_vendor",
+      "tool_input": {
+        "invoice_id": 501
+      },
+      "tool_output": {
+        "invoice_id": 501,
+        "amount": 840.0,
+        "due_date": "2026-08-28",
+        "status": "open",
+        "description": "Rush reprint CC-TEE-WHITE S",
+        "vendor_id": 1,
+        "vendor_name": "Bulldog Print Co",
+        "specialty": "apparel reprint",
+        "lead_days": 5,
+        "desk_date": "2026-08-31",
+        "days_past_due": 3
+      },
+      "db_check": {
+        "source": "data/campus_customs_new.db",
+        "query": "SELECT i.*, v.name vendor_name, v.specialty, v.lead_days FROM invoices i JOIN vendors v ON v.id=i.vendor_id WHERE i.id=501; SELECT date_today FROM desk",
+        "values_from_db": {
+          "invoice_id": 501,
+          "amount": 840.0,
+          "due_date": "2026-08-28",
+          "status": "open",
+          "description": "Rush reprint CC-TEE-WHITE S",
+          "vendor_id": 1,
+          "vendor_name": "Bulldog Print Co",
+          "specialty": "apparel reprint",
+          "lead_days": 5,
+          "desk_date": "2026-08-31",
+          "days_past_due": 3
+        },
+        "matches_db": true
+      }
+    },
+    {
+      "ticket": 102,
+      "prompt": "Ticket 102: Elm City Properties emailed that rent is due in 2 days. Does that match lease 1, and how much cash does the shop have to pay it?",
+      "tool_name": "get_lease_and_cash",
+      "tool_input": {
+        "lease_id": 1
+      },
+      "tool_output": {
+        "lease": {
+          "id": 1,
+          "space_name": "Chapel Street shop",
+          "landlord": "Elm City Properties",
+          "monthly_rent": 2400.0,
+          "next_due": "2026-09-02",
+          "notes": null
+        },
+        "cash_accounts": [
+          {
+            "name": "checking",
+            "balance": 3400.0,
+            "date": "2026-08-31"
+          }
+        ],
+        "desk_date": "2026-08-31",
+        "days_until_due": 2
+      },
+      "db_check": {
+        "source": "data/campus_customs_new.db",
+        "query": "SELECT * FROM leases WHERE id=1; SELECT * FROM cash_accounts; SELECT date_today FROM desk",
+        "values_from_db": {
+          "lease": {
+            "id": 1,
+            "space_name": "Chapel Street shop",
+            "landlord": "Elm City Properties",
+            "monthly_rent": 2400.0,
+            "next_due": "2026-09-02",
+            "notes": null
+          },
+          "cash_accounts": [
+            {
+              "name": "checking",
+              "balance": 3400.0,
+              "date": "2026-08-31"
+            }
+          ],
+          "desk_date": "2026-08-31",
+          "days_until_due": 2
+        },
+        "matches_db": true
+      }
+    }
+  ]
+}
